@@ -1,0 +1,3 @@
+[submodule "demo-crud-app"]
+	path = demo-crud-app
+	url = https://github.com/hatmarch/quarkus-transaction-crud.git

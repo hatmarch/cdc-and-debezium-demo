@@ -1,0 +1,17 @@
+{
+	"name": "Service Mesh Demo",
+	"dockerFile": "Dockerfile",
+	"runArgs": [
+		"-v", "${env:HOME}/.aws:/home/jboss/.aws",
+		"-e", "AWS_PROFILE=redhat"
+		//"AWS_PROFILE=${env:AWS_PROFILE}"
+	],
+	"extensions": [
+		"vscjava.vscode-java-pack",
+		"redhat.vscode-xml",
+		"joaompinto.asciidoctor-vscode"
+	],
+	"settings":{
+		"java.home": "/usr/lib/jvm/java-1.8.0-openjdk"
+	}
+}
