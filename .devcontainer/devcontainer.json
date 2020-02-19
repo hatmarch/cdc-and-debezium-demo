@@ -1,5 +1,5 @@
 {
-	"name": "Service Mesh Demo",
+	"name": "Debezium CDC Demo",
 	"dockerFile": "Dockerfile",
 	"runArgs": [
 		"-v", "${env:HOME}/.aws:/home/jboss/.aws",
