@@ -35,7 +35,7 @@ echo "Waiting up to 6 minutes for kafka cluster to be ready"
 oc wait --for=condition=Ready kafka/my-cluster --timeout=360
 echo "Kafka cluster is ready."
 
-# FIXME: Create a secret for the registry the kafkaconnects2i depends on
+# Create a secret for the registry the kafkaconnects2i depends on
 # redhat.registry.io 
 oc create secret docker-registry connects2i \
     --docker-server=registry.redhat.io \
