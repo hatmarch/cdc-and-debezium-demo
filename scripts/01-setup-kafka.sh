@@ -54,7 +54,8 @@ oc start-build my-connect-cluster-connect --from-dir=$DEMO_HOME/kube/kafka/conne
 # expose the connect API service
 oc expose svc my-connect-cluster-connect-api
 
-# Configure the connector
+# Configure the connector by calling through to its API
+# The values therein are coming from values set from the previous script and yaml files
 curl -X PUT -H "Content-Type: application/json" \
 -d '{ 
     "connector.class": "io.debezium.connector.mysql.MySqlConnector",
