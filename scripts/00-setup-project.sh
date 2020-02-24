@@ -4,7 +4,7 @@
 
 # Create a new project
 oc new-project debezium-cdc
-oc new-app --name=mysql debezium/example-mysql:0.9 \
+oc new-app --name=mysql debezium/example-mysql:1.1 \
                         -e MYSQL_ROOT_PASSWORD=password \
                         -e MYSQL_USER=testUser \
                         -e MYSQL_PASSWORD=password \
