@@ -24,8 +24,8 @@ MYSQL_POD=$(oc get pods -l deploymentconfig=mysql --no-headers=true -o jsonpath=
 
 echo "MYSQL Pod is: $MYSQL_POD"
 
-oc exec -n debezium-cdc -i "${MYSQL_POD}" -- mysql -u root -ppassword -h mysql sampledb -e 'CREATE TABLE transaction (transaction_id serial PRIMARY KEY,userId integer NOT NULL, amount integer NOT NULL,last_login TIMESTAMP);'
+oc exec -n debezium-cdc -i "${MYSQL_POD}" -- bash -c 'mysql -u root -ppassword -h mysql sampledb -e "CREATE TABLE transaction (transaction_id serial PRIMARY KEY,userId integer NOT NULL, amount integer NOT NULL,last_login TIMESTAMP);"'
 
-oc exec  -n debezium-cdc -i "${MYSQL_POD}" -- mysql -u root -ppassword -h mysql sampledb -e 'select * from transaction;'
+oc exec  -n debezium-cdc -i "${MYSQL_POD}" -- bash -c 'mysql -A -u root -ppassword -h mysql sampledb -e "select count(*) from transaction;"'
 
 echo "done"
