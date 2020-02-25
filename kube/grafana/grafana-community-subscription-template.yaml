@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: grafana-operator
+  annotations:
+    openshift.io/display-name: "Grafana Custom Dashboards"
+    description: >-
+      This template installs Grafana operator for use with custom dashboards
+    tags: "monitoring"
+    iconClass: "fa fa-exchange"
+message: "Grafana community operator is being installed to project ${PROJECT_NAME}"
+parameters:
+- description: The name of the project the operator will be installed to
+  displayName: Name of project
+  name: PROJECT_NAME
+  value: debezium-monitoring
+  required: true
+- description: The version of the operator to install (starting CSV)
+  displayName: Operator version
+  name: OPERATOR_VERSION
+  value: "grafana-operator.v2.0.0"
+objects:
+- apiVersion: operators.coreos.com/v1alpha1
+  kind: Subscription
+  metadata:
+    name: grafana-operator
+    namespace: ${PROJECT_NAME}
+  spec:
+    channel: alpha
+    installPlanApproval: Automatic
+    name: grafana-operator
+    source: community-operators
+    sourceNamespace: openshift-marketplace
+    startingCSV: ${{OPERATOR_VERSION}}
