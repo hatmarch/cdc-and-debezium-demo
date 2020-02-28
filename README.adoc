@@ -1,0 +1,27 @@
+= Change Data Capture with Debezium =
+
+This demo shows how you can install Debezium on an OpenShift 4.3 (and above) cluster.
+
+There is a small app at the heart of the demo that is writing to a MySQL database (it's added to this repo as a submodule).  
+
+[red]#FIXME: Add image of app#
+
+We start with that app and slowly add the following:
+
+1. Use operators to install AMQ Streams on the cluster (pre-requisite for Debezium)
+2. Setup KafkaConnectS2I
+3. Build and install the Debezium Connector for MySQL
+4. Demonstrate change events coming through Debezium 
+5. Use fuse to transform events coming out of the Database for feeding into Elastisearch
+6. Publish connector metrics to central OpenShift Monitoring
+7. Install a custom grafana dashboard to visualize metrics
+
+[red]#FIXME: Show final flow image#
+
+[red]#FIXME: Update above with links or fill in the below#
+
+== Installing AMQ Streams ==
+
+
+== KafkaConnect S2I
+
