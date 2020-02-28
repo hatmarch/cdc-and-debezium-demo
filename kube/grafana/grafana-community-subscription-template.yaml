@@ -31,4 +31,4 @@ objects:
     name: grafana-operator
     source: community-operators
     sourceNamespace: openshift-marketplace
-    startingCSV: ${{OPERATOR_VERSION}}
+    startingCSV: ${OPERATOR_VERSION}
