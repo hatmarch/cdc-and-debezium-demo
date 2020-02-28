@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    k8s-app: prometheus-dbz-connector-monitor
+  name: prometheus-dbz-connector-monitor
+  namespace: debezium-cdc
+spec:
+  endpoints:
+  - interval: 10s
+    scheme: http
+    targetPort: 9404
+  selector:
+    matchLabels:
+        strimzi.io/cluster: my-connect-cluster 
