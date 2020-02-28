@@ -1,4 +1,4 @@
-= Change Data Capture with Debezium =
+= Change Data Capture with Debezium (on OpenShift 4.3)=
 
 This demo shows how you can install Debezium on an OpenShift 4.3 (and above) cluster.
 
