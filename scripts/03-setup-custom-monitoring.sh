@@ -8,10 +8,10 @@ oc apply -f $DEMO_HOME/kube/grafana/cluster-monitoring-config.yaml
 
 # wait for user workload pods to come up in new project
 sleep 5
-oc -n openshift-user-workload-monitoring wait --for=condition=available po/prometheus-user-workload-0
+oc -n openshift-user-workload-monitoring wait --for=condition=available po/prometheus-user-workload-0 --timeout 10m
 
 # deploy service monitor to scrape metrics into central prometheus monitoring
-oc apply -f /workspaces/cdc-and-debezium-demo/kube/grafana/service-monitor-debezium-connector.yaml -n debezium-cdc
+oc apply -f $DEMO_HOME/kube/grafana/service-monitor-debezium-connector.yaml -n debezium-cdc
 
 
 if [ -z "$1" ]; then
@@ -31,8 +31,11 @@ oc new-project $PROJECT_NAME --display-name="Custom Debezium Monitoring" \
 
 oc process -f $DEMO_HOME/kube/grafana/grafana-community-subscription-template.yaml PROJECT_NAME="${PROJECT_NAME}" -o yaml | oc apply -f -
 
+# wait for grafana operator to appear
+sleep 5 
+
 # can't seem to wait on the operator itself, maybe waiting on the deployment is good enough
-oc wait --for=condition=available deployment/grafana-operator
+oc wait --for=condition=available deployment/grafana-operator --timeout=10m
 
 oc process -f $DEMO_HOME/kube/grafana/grafana-instance-template.yaml PROJECT_NAME="${PROJECT_NAME}" \
     ADMIN_PASSWORD="${ADMIN_PASSWORD}" -o yaml | oc apply -f -
@@ -41,7 +44,7 @@ oc process -f $DEMO_HOME/kube/grafana/grafana-instance-template.yaml PROJECT_NAM
 sleep 5
 
 # Wait until grafana instance is deployed
-oc wait --for=condition=available deployment/grafana-deployment
+oc wait --for=condition=available deployment/grafana-deployment --timeout=10m
 
 # Patch Prometheus so that it can connect with the customer grafana instance in our project
 # FIXME: doing by index of array seems dangerous, but it doesn't appear that there is another way to do this with patching
