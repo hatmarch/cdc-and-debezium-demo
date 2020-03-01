@@ -7,7 +7,7 @@ metadata:
   namespace: debezium-cdc
 spec:
   endpoints:
-  - interval: 10s
+  - interval: 5s
     scheme: http
     targetPort: 9404
   selector:

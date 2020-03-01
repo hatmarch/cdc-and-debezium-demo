@@ -102,6 +102,110 @@ image:images/original-app.png[]
 
 == Installing AMQ Streams ==
 
+AMQ Streams is easily setup using an Red Hat's AMQ Operator.  This can be installed manually or can be done using the provided script.  Debezium will leverage Kafka's KafkaConnect functionality to allow changes sourced from the target database to be turned into consumeable events.
 
-== KafkaConnect S2I
+----
+$DEMO_HOME/scripts/01-setup-kafka.sh
+----
 
+The script will do the following:
+
+* Install amqstreams.v1.3.0 operator
+* Create a kafka cluster in the debezium-cdc project
+* install a secret for accessing quay.io (this is where the kafkaconnects2i image lives)
+* Create the KafkaConnectS2I instance (for building the debezium connector)
+
+== Building Debezium Connector ==
+
+Now that the KafkaConnectS2I builder is installed, we can start a binary build with all our connector information.
+
+This repo already has a local version of all the plugins the debezium connector needs at `$DEMO_HOME\kube\kafka\connect-plugins` but if you want to see where they were downloaded from (or want to update the contents of this directory) you can do the following:
+
+----
+rm -rf $DEMO_HOME/kube/kafka/connect-plugins
+$DEMO_HOME/scripts/download-plugins.sh
+----
+
+Once we have our debezium plugins downloaded (which includes the MySQL plugin that we'll use to connect to the demo app's database we set up previously) we can create the connector
+
+----
+$DEMO_HOME/scripts/02-setup-debezium-connector.sh
+----
+
+This script will do the following:
+
+* build the debezium kafka connector from what's in the connect-plugins directory
+* Create a route to the connect api
+* Check that the debezium kafka connector can be reached
+* Register and configure a new connector at the end point called `debezium-connector-mysql`
+
+Here are some of the aspects that are configured:
+
+image:images/connector-config.png[]
+
+If the connector is setup correctly it will create a number of different topics based on the database and the events it's been configured to look for.  For more information see the link:www.debezium.io[official web site]
+
+[TIP]
+====
+You can a list of all currently registered topics (including those registered by the connector) by running this command
+----
+oc exec -c kafka my-cluster-kafka-0 -- /opt/kafka/bin/kafka-topics.sh --bootstrap-server my-cluster-kafka-bootstrap:9092 -n debezium-monitoring --list
+----
+====
+
+=== Common issues ===
+
+==== Image Registry issues ====
+
+If you see this error:
+
+----
+The ImageStreamTag "my-connect-cluster-connect-source:1.3.0" is invalid: from: Error resolving ImageStreamTag my-connect-cluster-connect-source:1.3.0 in namespace debezium-cdc: unable to find latest tagged image
+----
+
+It's probably an issue with your registry.io credentials.  Open the ImageStreams tab of the project and look at the `my-connect-cluster-connect-source` image stream.  If you see a warning at the top that when expanded looks like this:
+
+image:images/image-stream-issue.png[]
+
+Then you likely have an issue with the secret that was provided to log into registry.io.  Check your login details and update the secret `connects2i` and re-run the script
+
+== Testing Connector ==
+
+Test the connector by seeing messages come in as we change records in the demo-app's database
+
+1. Start watching the queue that represents database cdc events
+----
+oc exec -c kafka my-cluster-kafka-0 -- /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic sampledb -n debezium-monitoring --from-beginning --max-messages 1
+----
+1. open the demo-app
+2. Click buy
+
+You should see the following from the consumer window:
+
+or prettified:
+
+image:images/change-event-partial.png[]
+
+== Installing Custom Monitoring ==
+
+The debezium connector we deployed has also the JMX plugin installed within it that allows it to expose metrics to openshift.  We'll take advantage of OpenShift's custom ServiceMonitor (new in OpenShift 4.3) to dump those metrics into the central OpenShift prometheus instance
+
+The metrics were actually enabled in the previous step.  They were defined in the KafkaConnectS2I instance under the `metrics` key
+
+image:images/metrics-exposed.png[]
+
+To setup custom monitoring run:
+
+----
+$DEMO_HOME/scripts/02-setup-debezium-connector.sh
+----
+
+Which does the following:
+
+1. Activates and enables UserWorkloads by updating `cluster-monitoring-config`
+2. waits for user-workload pods to come up successfully in openshift-monitoring
+3. creates a ServiceMonitor to scrape metrics out of the debezium connector
+
+== Custom Grafana Dashboard for Debezium ==
+
+image:images/debezium-custom-dashboard-example.png[]
