@@ -1,3 +1,7 @@
 [submodule "demo-crud-app"]
 	path = demo-crud-app
 	url = https://github.com/hatmarch/quarkus-transaction-crud.git
+[submodule "kube/grafana/grafana-operator"]
+	path = kube/grafana/grafana-operator
+	url = https://github.com/integr8ly/grafana-operator.git
+	branch = master
