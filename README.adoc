@@ -8,13 +8,13 @@ image:images/original-app.png[]
 
 We start with that app and slowly add the following:
 
-1. Use operators to install AMQ Streams on the cluster (pre-requisite for Debezium)
-2. Setup KafkaConnectS2I
-3. Build and install the Debezium Connector for MySQL
-4. Demonstrate change events coming through Debezium 
-5. Use fuse to transform events coming out of the Database for feeding into Elastisearch
-6. Publish connector metrics to central OpenShift Monitoring
-7. Install a custom grafana dashboard to visualize metrics
+1. <<Initial Project and App Setup,Deploying our Quarkus and MySQL based test app>>
+1. <<Installing AMQ Streams,Use operators to install AMQ Streams on the cluster (with KafkaConnectS2I)>> (pre-requisite for Debezium)
+3. <<Building Devezium Connector,Build and install the Debezium Connector for MySQL>>
+4. <<Testing Connector,Demonstrate change events coming through Debezium>>
+5. Use Fuse to transform events coming out of the Database for feeding into Elastisearch
+6. <<Installing Custom Monitoring,Publish connector metrics to central OpenShift Monitoring>>
+7. <<Custom Grafana Dashboard for Debezium,Install a custom grafana dashboard to visualize metrics>>
 
 image:images/overall-arch.png[]
 
@@ -54,7 +54,7 @@ As part of this process, the current user will be granted `anyuid` scc privilege
 
 The script will also create the database and check that the schema has been created correctly.
 
-If all went well, the last lines of output should look like this:footnote:[If output does not match then you can look into link:/scripts/00-setup-app.sh[the shell script] for where things went wrong and run the commands manually]
+If all went well, the last lines of output should look like this:footnote:[If output does not match then you can look into link:scripts/00-setup-app.sh[the shell script] for where things went wrong and run the commands manually]
 
 ----
 MYSQL Pod is: mysql-1-r5kb4
@@ -237,7 +237,7 @@ image:images/debezium-metrics.png[]
 
 == Custom Grafana Dashboard for Debezium ==
 
-Now that (debezium-based) metrics are coming in from our debezium connector and flowing into the `openshift-monitoring` prometheus instance, we can now setup a custom dashboard to visualize our connector.
+Now that (debezium-based) metrics are coming in from our debezium connector and flowing into the `openshift-monitoring` prometheus instance, we can now setup a custom dashboard to visualize our connector.  _The dashboard we'll be installing is based on the work by Bhunvanesh in his post link:https://medium.com/searce/grafana-dashboard-for-monitoring-debezium-mysql-connector-d5c28acf905b[here]._
 
 There are a few things we need to keep in mind before setting up this connector:
 
@@ -245,17 +245,47 @@ There are a few things we need to keep in mind before setting up this connector:
 
 * The existing grafana operator (v2.0.0) does not support a version of grafana that has the necessary features for use to configure querying the central `openshift-monitoring` prometheus [blue]#thus we will install the operator apart from the OLM and the operator's link:https://github.com/integr8ly/grafana-operator[repo] is setup as a submodule of this one#
 
-* There appears to be a bug in the translation of the `GrafanaDashboard` CustomResource into a ConfigMap for the Grafana instance [blue]#thus we install the `GrafanaDashboard` and ConfigMap at the same time using a template
+* There appears to be a bug in the translation of the `GrafanaDashboard` CustomResource into a ConfigMap for the Grafana instance [blue]#thus we install the `GrafanaDashboard` and ConfigMap at the same time using a template#
 
 The installation of the custom Grafana dashboard should be fully automated by running this script with the following two parameters:
 
-1. Project Name: The name of the project to deploy the dashboard in.  Default is `debezium-monitoring`
+1. *Project Name*: The name of the project to deploy the dashboard in.  Default is `debezium-monitoring`
 
-2. Grafana Admin Password: The admin password for use in accessing Grafana in admin capacity.  Default is `openshift`
+2. *Grafana Admin Password*: The admin password for use in accessing Grafana in admin capacity.  Default is `openshift`
+
+[NOTE]
+====
+The dashboard will connect to the `thanos-querier` using the oauth-proxy on port 9091.  It will skip TLS verify and will connect using the `grafana-serviceaccount` which is granted `cluster-monitoring-view` role.
+
+For more details, look link:scripts/04-setup-custom-grafana.sh[into the bash script]
+====
 
 ----
 $DEMO_HOME/scripts/04-setup-custom-grafana.sh debezium-monitoring openshift 
 ----
 
+When the script has finished, you should see the following which ends with the route to the new Grafana instance
+
+----
+Warning: oc apply should be used on resource created by either oc create --save-config or oc apply
+configmap/grafana-datasources configured
+grafanadashboard.integreatly.org/dbz-dashboard created
+deployment.extensions/grafana-deployment condition met
+https://grafana-route-debezium-monitoring.apps.cluster-mel-dbz-2189.mel-dbz-2189.example.opentlc.com/
+----
+
+Click on that link (note that sometimes that pod hasn't completely finished initializing) and log into the dashboard using the _admin password_ you specified earlier
+
+image:images/grafana-signin-button.png[]
+
+Once logged in, you should be able to find the debezium dashboard by clicking on _Home_ and then selecting the debezium dashboard:
+
+image:images/debezium-dashboard.png[]
+
+Opening the dashboard you should see something like this:
 
 image:images/debezium-custom-dashboard-example.png[]
+
+To get the metrics to look more real-time, you might consider adjusting the timings in the upper right corner of the dashboard
+
+image:images/dashboard-update.png[]
