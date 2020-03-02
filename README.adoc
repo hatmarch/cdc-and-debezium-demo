@@ -139,7 +139,16 @@ This script will do the following:
 * Check that the debezium kafka connector can be reached
 * Register and configure a new connector at the end point called `debezium-connector-mysql`
 
-Here are some of the aspects that are configured:
+If the command has run successfully, you should see this at the end of the run:
+----
+Checking that the mysql connector has been initialized:
+["debezium-connector-mysql"]
+done.
+----
+
+This indicates that the connector has been successfully built, deployed, and a configuration called `debezium-connector-mysql` has been registered.  If you are not seeing this output, then check the <<Common Issues>> section below.
+
+Here are some of the aspects that were configured as part of `debezium-connector-mysql`:
 
 image:images/connector-config.png[]
 
@@ -153,7 +162,7 @@ oc exec -c kafka my-cluster-kafka-0 -- /opt/kafka/bin/kafka-topics.sh --bootstra
 ----
 ====
 
-=== Common issues ===
+=== Common Issues ===
 
 ==== Image Registry issues ====
 
@@ -167,7 +176,23 @@ It's probably an issue with your registry.io credentials.  Open the ImageStreams
 
 image:images/image-stream-issue.png[]
 
-Then you likely have an issue with the secret that was provided to log into registry.io.  Check your login details and update the secret `connects2i` and re-run the script
+Then you likely have an issue with the secret that was provided to log into registry.io.  Check your login details and update the secret `connects2i` and re-run the script.
+
+[NOTE]
+====
+The official documentation generally recommends linking the `default` and/or `builder` service accounts with the (pull-) secret.  This wasn't necessary in my testing.  If you want to try this, the calls are:
+
+----
+oc secrets link default connects2i -n debezium-cdc
+oc secrets link builder connects2i -n debezium-cdc
+----
+====
+
+In some cases if you can't get the imagestream to do the pull correctly, you might need to [red]#completely uninstall the kafka operator# (not just the connnect component) to get things to reset
+
+----
+oc delete csv/amqstreams.v1.3.0
+----
 
 == Testing Connector ==
 
@@ -197,7 +222,7 @@ image:images/metrics-exposed.png[]
 To setup custom monitoring run:
 
 ----
-$DEMO_HOME/scripts/02-setup-debezium-connector.sh
+$DEMO_HOME/scripts/03-setup-custom-monitoring.sh
 ----
 
 Which does the following:
@@ -206,6 +231,31 @@ Which does the following:
 2. waits for user-workload pods to come up successfully in openshift-monitoring
 3. creates a ServiceMonitor to scrape metrics out of the debezium connector
 
+You can tell the custom monitoring has been successful by navigating to the central metrics dashboard and typing in a metric that starts with `debezium` (see also the metrics section of link:kube/kafka/kafkaconnects2i-my-connect-cluster.yaml[kafkaconnects2i-my-connect-cluster.yaml])
+
+image:images/debezium-metrics.png[]
+
 == Custom Grafana Dashboard for Debezium ==
+
+Now that (debezium-based) metrics are coming in from our debezium connector and flowing into the `openshift-monitoring` prometheus instance, we can now setup a custom dashboard to visualize our connector.
+
+There are a few things we need to keep in mind before setting up this connector:
+
+* There is no ability to create a custom dashboard in the built-in `openshift-monitoring` grafana because admin access is not possible [blue]#thus we need to create our own#
+
+* The existing grafana operator (v2.0.0) does not support a version of grafana that has the necessary features for use to configure querying the central `openshift-monitoring` prometheus [blue]#thus we will install the operator apart from the OLM and the operator's link:https://github.com/integr8ly/grafana-operator[repo] is setup as a submodule of this one#
+
+* There appears to be a bug in the translation of the `GrafanaDashboard` CustomResource into a ConfigMap for the Grafana instance [blue]#thus we install the `GrafanaDashboard` and ConfigMap at the same time using a template
+
+The installation of the custom Grafana dashboard should be fully automated by running this script with the following two parameters:
+
+1. Project Name: The name of the project to deploy the dashboard in.  Default is `debezium-monitoring`
+
+2. Grafana Admin Password: The admin password for use in accessing Grafana in admin capacity.  Default is `openshift`
+
+----
+$DEMO_HOME/scripts/04-setup-custom-grafana.sh debezium-monitoring openshift 
+----
+
 
 image:images/debezium-custom-dashboard-example.png[]
