@@ -1,0 +1,2 @@
+GET https://elasticsearch.openshift-logging.svc.cluster.local:9200/
+Authorization: Bearer XXXX
