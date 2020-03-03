@@ -13,6 +13,8 @@ Most the the instructions here follow the link:https://docs.openshift.com/contai
 
 We going to run a script that will install the elasticsearch operator on all projects on the cluster and then create a cluster logging instance in a project called "openshift-logging".  This will gather all log information from all projects and will create a kibana instance that will give us a UI into the log data.
 
+[TIP] If your cluster is small or only useful for a demo you can configure the link:../kube/logging/customlogging-instance.yaml[`Cluster Logging` CR] to require fewer resources including <<Run Elasicsearch in Ephemeral Mode,running Elasticsearch in Ephemeral Mode>> to reduce need for persistent volumes.
+
 Run the following command to install:
 
 ----
@@ -41,6 +43,22 @@ If you accept these prompts, you should then be brought to the kibana dashboard 
 image:../images/kibana-dashboard.png[]
 
 Happy log splunking!
+
+== Appendix ==
+
+=== Run Elasicsearch in Ephemeral Mode ===
+
+You can configure Cluster Logging's Elasticsearch to not require persistent volumes (with the tradeoff that logs won't persist).  This can be preferrable in a demo environment where resources are tight.  (See also instructions link:https://docs.openshift.com/container-platform/4.3/logging/config/cluster-logging-elasticsearch.html#cluster-logging-elasticsearch-persistent-storage-empty_cluster-logging-elasticsearch[here])
+
+To do this, update the link:../kube/logging/customlogging-instance.yaml[`Cluster Logging` CR] to specify the `emptyDir` as follows:
+
+image:../images/cluster-logging-spec.png[]
+
+Then either run the installation or update the cluster logging instancefootnote:instance[This has not yet been verified to auto-update on a pre-existing installation.  You may need to first delete the `ClusterLogging` CR and then re-apply]:
+
+----
+oc apply -f $DEMO_HOME/kube/logging/customlogging-instance.yaml -n openshift-logging
+----
 
 === Troubleshooting ===
 
