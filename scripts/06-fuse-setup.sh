@@ -35,14 +35,11 @@ while true do
         "Failed to install or upgrade FuseOnline.  Try reinstalling the Syndesis CR"
         exit 1
     fi
-    echo "Waiting for FuseOnline instance to install.  Current status is: $CURRENT_STATUS"
+    echo "Waiting for FuseOnline instance to install.  Current status is: $CURRENT_STATUS..."
+    sleep 5
 done
 
 echo "Finished installing FuseOnline instance"
 
 echo "Find the fuse route here:"
 echo "http://$(oc get route syndesis -o jsonpath='{.spec.host}')"
-
-#FIXME: Install a Syndesis custom resource and wait for its setup to complete.
-# NOTE: This link implies it won't work: https://github.com/syndesisio/syndesis/issues/7808
-
