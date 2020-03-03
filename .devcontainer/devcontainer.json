@@ -9,7 +9,9 @@
 	"extensions": [
 		"vscjava.vscode-java-pack",
 		"redhat.vscode-xml",
-		"joaompinto.asciidoctor-vscode"
+		"joaompinto.asciidoctor-vscode",
+		// REST CLIENT for querying elastic search
+		"humao.rest-client"
 	],
 	"settings":{
 		"java.home": "/usr/lib/jvm/java-1.8.0-openjdk"
