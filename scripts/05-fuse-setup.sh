@@ -15,6 +15,34 @@ fi
 # link the operator to the secret
 oc secrets link syndesis-operator connects2i --for=pull
 
+# create a fuse online instance
+oc apply -f $DEMO_HOME/kube/fuse/syndesis.yaml
+
+# state check on Syndesis CR is based on documentation of states here: 
+# https://github.com/syndesisio/syndesis/tree/master/install/operator#available-fields
+while true do
+    CURRENT_STATUS=$(oc get syndesis app -o jsonpath='{.status.phase}' -n debezium-cdc)
+    if [ $CURRENT_STATUS eq "Installed" ]; then
+        break
+    fi
+
+    if [ $CURRENT_STATUS eq "StartupFailed" ]; then
+        "Failed to install FuseOnline.  Try reinstalling the Syndesis CR"
+        exit 1
+    fi
+
+    if [ $CURRENT_STATUS eq "UpgradeFailed" ]; then
+        "Failed to install or upgrade FuseOnline.  Try reinstalling the Syndesis CR"
+        exit 1
+    fi
+    echo "Waiting for FuseOnline instance to install.  Current status is: $CURRENT_STATUS"
+done
+
+echo "Finished installing FuseOnline instance"
+
+echo "Find the fuse route here:"
+echo "http://$(oc get route syndesis -o jsonpath='{.spec.host}')"
+
 #FIXME: Install a Syndesis custom resource and wait for its setup to complete.
 # NOTE: This link implies it won't work: https://github.com/syndesisio/syndesis/issues/7808
 

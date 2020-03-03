@@ -12,7 +12,7 @@ We start with that app and slowly add the following:
 1. <<Installing AMQ Streams,Use operators to install AMQ Streams on the cluster (with KafkaConnectS2I)>> (pre-requisite for Debezium)
 3. <<Building Devezium Connector,Build and install the Debezium Connector for MySQL>>
 4. <<Testing Connector,Demonstrate change events coming through Debezium>>
-5. Use Fuse to transform events coming out of the Database for feeding into Elastisearch
+5. <<Fuse Online Installation,Use Fuse to transform events coming out of the Database for feeding into Elastisearch>>
 6. <<Installing Custom Monitoring,Publish connector metrics to central OpenShift Monitoring>>
 7. <<Custom Grafana Dashboard for Debezium,Install a custom grafana dashboard to visualize metrics>>
 
@@ -210,6 +210,24 @@ You should see the following from the consumer window:
 or prettified:
 
 image:images/change-event-partial.png[]
+
+== Fuse Online Installation ==
+
+Next we'll install Fuse online as the bridge between our CDC events from Debezium to our Elasticsearch instance.  Do this by running this script:
+
+----
+$DEMO_HOME/05-fuse-setup.sh
+----
+
+This script does the following:
+
+* Installs the FuseOnline operator
+* Installs an instance of FuseOnline in the debezium-cdc project and waits until it finishes
+* Finds the route to the FuseOnline dashboard
+
+When the installation is complete, you should see the route to the FuseOnline (Syndesis) dashboard printed out.  Follow this link and log in with your OpenShift credentials.  You should then see the following screen:
+
+image:images/fuse-online-dashboard.png
 
 == Installing Custom Monitoring ==
 
