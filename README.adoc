@@ -213,10 +213,20 @@ image:images/change-event-partial.png[]
 
 == Fuse Online Installation ==
 
-Next we'll install Fuse online as the bridge between our CDC events from Debezium to our Elasticsearch instance.  Do this by running this script:
+Next we'll install Fuse online as the bridge between our CDC events from Debezium to our Elasticsearch instance.  
+
+[NOTE]
+.If you didn't bring your own Elasticsearch instance
+====
+This demo can be setup to connect to any Elasticsearch instance to which you have access.  If you don't have one handy, you can attempt to setup your own instance by installing cluster-logging on the OpenShift cluster.  
+
+You can setup cluster-logging by following the directions link:docs/CustomLogging.adoc[here].
+====
+
+Install Fuse Online into our cluster by running this script:
 
 ----
-$DEMO_HOME/05-fuse-setup.sh
+$DEMO_HOME/06-fuse-setup.sh
 ----
 
 This script does the following:
