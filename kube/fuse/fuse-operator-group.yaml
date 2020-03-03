@@ -1,0 +1,8 @@
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: fuse-online
+  namespace: debezium-cdc
+spec:
+  targetNamespaces:
+  - debezium-cdc
