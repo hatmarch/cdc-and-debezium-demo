@@ -42,19 +42,23 @@ sleep 5
 # create custom-logging CR instance
 oc apply -f $DEMO_HOME/kube/logging/customlogging-instance.yaml
 
-# wait For the deployment
+# wait for the cluster logging operator
+sleep 5
+oc wait --for=condition=Available deployment/cluster-logging-operator --timeout=5m -n openshift-logging
+
+# once the logging operator is available, wait for it to spawn other deployments
 sleep 5
 
 # wait until all deployments in the project are ready
-NUM_DEPLOYMENTS=$(oc get deployments --no-headers=true | wc -l)
+NUM_DEPLOYMENTS=$(oc get deployments --no-headers=true -n openshift-logging | wc -l)
 while true; do
     # wait until at least 1 deployment is ready from each deployment
-    NUM_READY_DEPLOYMENTS=$(oc get deployments -o custom-columns=READY:.status.readyReplicas --no-headers=true | grep -v 0 | wc -l)
+    NUM_READY_DEPLOYMENTS=$(oc get deployments -o custom-columns=READY:.status.readyReplicas --no-headers=true -n openshift-logging | grep -v \<none\> | wc -l)
     if [ $NUM_DEPLOYMENTS -eq $NUM_READY_DEPLOYMENTS ]; then
         echo "All Deployments are ready"
         break
     fi
-    echo "$NUM_READY_DEPLOYMENTS of $NUM_DEPLOYMENTS ready."
+    echo "$NUM_READY_DEPLOYMENTS of $NUM_DEPLOYMENTS ready..."
     sleep 5
 done
 
