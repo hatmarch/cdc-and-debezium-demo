@@ -226,7 +226,7 @@ You can setup cluster-logging by following the directions link:docs/CustomLoggin
 Install Fuse Online into our cluster by running this script:
 
 ----
-$DEMO_HOME/06-fuse-setup.sh
+$DEMO_HOME/scripts/06-fuse-setup.sh
 ----
 
 This script does the following:
