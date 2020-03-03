@@ -237,7 +237,38 @@ This script does the following:
 
 When the installation is complete, you should see the route to the FuseOnline (Syndesis) dashboard printed out.  Follow this link and log in with your OpenShift credentials.  You should then see the following screen:
 
-image:images/fuse-online-dashboard.png
+image:images/fuse-online-dashboard.png[]
+
+=== Create Kafka Connection ===
+
+Now in the UI, navigate to create connection:
+
+image:images/fuse-create-connection.png[]
+
+First we're going to connect to our kafka cluster so that we can subscribe to the appropriate Debezium topic.  Look for the _kafka_ connector by typing that into the filter and select the _Kafka Message Broker_
+
+image:images/fuse-kafka-connector.png[]
+
+Next, fill in the details as shown to access the kafka broker _service_ (assuming that the name shown is your service name and you've deployed fuse into the same project as the kafka cluster).  Check to make sure everything is good by clicking on _Validate_ before clicking _Next_
+
+IMPORTANT: You can't use https to connect to the broker or you will get OOM errors (per Fuse documentation)
+
+image:images/fuse-kafka-details.png[]
+
+Click _Next_ for the next screen and then you'll be returned to the connections screen.  Next let's connect to our Elasticsearch instance
+
+=== Create Elasticsearch Connection ===
+
+[NOTE]
+====
+For this section, we're going to assume you're connecting to the elasticsearch instance that is installed on the cluster in the `openshift-logging` project.  If you are trying to connect to a different Elasticsearch instance, you'll need to update endpoints (and possibly commands depending on version) accordingly.
+
+At the time of this writing, the cluster-logging ElasticSearch version was 5.6.x.  Documentation for this version can be found link:https://www.elastic.co/guide/en/elasticsearch/reference/5.6/index.html[here].
+====
+
+
+
+
 
 == Installing Custom Monitoring ==
 

@@ -7,9 +7,11 @@ metadata:
 spec:
   addons:
     todo:
-      enabled: false
+      enabled: "false"
     ops:
-      enabled: true
+      enabled: "true"
+    camelk:
+      enabled: "false"
   components:
     db:
       resources: {}
