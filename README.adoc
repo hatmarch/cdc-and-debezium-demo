@@ -200,7 +200,7 @@ Test the connector by seeing messages come in as we change records in the demo-a
 
 1. Start watching the queue that represents database cdc events
 ----
-oc exec -c kafka my-cluster-kafka-0 -- /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic sampledb -n debezium-monitoring --from-beginning --max-messages 1
+oc exec -c kafka my-cluster-kafka-0 -n debezium-cdc -- /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic transaction --from-beginning --max-messages 1
 ----
 1. open the demo-app
 2. Click buy
@@ -266,13 +266,9 @@ For this section, we're going to assume you're connecting to the elasticsearch i
 At the time of this writing, the cluster-logging ElasticSearch version was 5.6.x.  Documentation for this version can be found link:https://www.elastic.co/guide/en/elasticsearch/reference/5.6/index.html[here].
 ====
 
-
-
-
-
 == Installing Custom Monitoring ==
 
-The debezium connector we deployed has also the JMX plugin installed within it that allows it to expose metrics to openshift.  We'll take advantage of OpenShift's custom ServiceMonitor (new in OpenShift 4.3) to dump those metrics into the central OpenShift prometheus instance
+The debezium connector we deployed has also the JMX plugin installed within it that allows it to expose metrics to openshift.  We'll take advantage of OpenShift's link:https://docs.openshift.com/container-platform/4.3/monitoring/monitoring-your-own-services.html[custom ServiceMonitor] (new in OpenShift 4.3) to dump those metrics into the central OpenShift prometheus instance
 
 The metrics were actually enabled in the previous step.  They were defined in the KafkaConnectS2I instance under the `metrics` key
 
