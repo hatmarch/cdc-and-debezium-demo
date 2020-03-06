@@ -152,6 +152,8 @@ Here are some of the aspects that were configured as part of `debezium-connector
 
 image:images/connector-config.png[]
 
+For more information about link:debezium-connector/connector-config.json[this configuration], see the documentation link:https://debezium.io/documentation/reference/1.0/connectors/mysql.html#connector-properties[here].
+
 If the connector is setup correctly it will create a number of different topics based on the database and the events it's been configured to look for.  For more information see the link:www.debezium.io[official web site]
 
 [TIP]
@@ -344,3 +346,10 @@ image:images/debezium-custom-dashboard-example.png[]
 To get the metrics to look more real-time, you might consider adjusting the timings in the upper right corner of the dashboard
 
 image:images/dashboard-update.png[]
+
+[NOTE]
+====
+If for some reason you are not seeing any metrics being updated, it's possible you've had a new instance of the connector start and you're looking at the data from the old instance.  To check this, go to the _Connector Node_ dropdown and select a different instance:
+
+image:images/connector-node-fix.png[]
+====

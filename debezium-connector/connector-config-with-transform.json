@@ -1,0 +1,18 @@
+{ 
+  "connector.class": "io.debezium.connector.mysql.MySqlConnector",
+  "tasks.max": "1",
+  "database.hostname": "mysql", 
+  "database.port": "3306", 
+  "database.user": "root", 
+  "database.password": "password", 
+  "database.server.id": "184054",
+  "database.server.name": "sampledb", 
+  "database.whitelist": "sampledb",
+  "database.history.kafka.bootstrap.servers": "my-cluster-kafka-bootstrap:9092", 
+  "database.history.kafka.topic": "changes-topic",
+  "decimal.handling.mode" : "double",
+  "transforms": "route",
+  "transforms.route.type": "org.apache.kafka.connect.transforms.RegexRouter",
+  "transforms.route.regex": "([^.]+)\\.([^.]+)\\.([^.]+)",
+  "transforms.route.replacement": "$3"
+}
