@@ -1,0 +1,37 @@
+[
+  {
+    "_id": "AXCu3biM-tDuqey6NXWn",
+    "_type": "search",
+    "_source": {
+      "title": "Foo",
+      "description": "",
+      "hits": 0,
+      "columns": [
+        "amount",
+        "transactionNo"
+      ],
+      "sort": [
+        "_score",
+        "desc"
+      ],
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"AXCuy5um-tDuqey6NXWm\",\"highlightAll\":true,\"version\":true,\"query\":{\"match_all\":{}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "AXCuz-tID2lytHYUBY2B",
+    "_type": "visualization",
+    "_source": {
+      "title": "Count and average amount",
+      "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{},\"schema\":\"metric\",\"type\":\"count\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"customLabel\":\"average_amount\",\"field\":\"amount\"},\"schema\":\"metric\",\"type\":\"avg\"}],\"listeners\":{},\"params\":{\"perPage\":10,\"showMeticsAtAllLevels\":true,\"showPartialRows\":false,\"showTotal\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"totalFunc\":\"sum\",\"type\":\"table\"},\"title\":\"Count and average amount\",\"type\":\"table\"}",
+      "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":0,\"direction\":\"asc\"}}}}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"AXCuy5um-tDuqey6NXWm\",\"query\":{\"match_all\":{}},\"filter\":[]}"
+      }
+    }
+  }
+]
