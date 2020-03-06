@@ -29,6 +29,7 @@ objects:
 - kind: DeploymentConfig
   apiVersion: apps.openshift.io/v1
   metadata:
+    name: elasticsearch-proxy
     labels:
       app: es-proxy
   spec:
@@ -44,17 +45,6 @@ objects:
       activeDeadlineSeconds: 21600
     triggers:
       - type: ConfigChange
-      - type: ImageChange
-        imageChangeParams:
-          automatic: true
-          containerNames:
-            - proxy
-          from:
-            kind: ImageStreamTag
-            namespace: $PROJECT_NAME
-            name: 'proxy:latest'
-          lastTriggeredImage: >-
-            registry.redhat.io/rhscl/httpd-24-rhel7@sha256:32e50b54dccf847354e224d18ba58f39da053e351cf2377a9865206a43c5c62a
     replicas: 1
     revisionHistoryLimit: 10
     test: false
