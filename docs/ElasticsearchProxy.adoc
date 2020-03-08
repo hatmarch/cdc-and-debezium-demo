@@ -38,4 +38,6 @@ The token that is used to access the elasticsearch endpoint must for a user that
 
 To see which OpenShift users/roles have what kind of access, use the es_acl command on an ElasticSearch node as per link:https://bugzilla.redhat.com/show_bug.cgi?id=1545920[here].
 
+image:images/es-acl.png[]
+
 It should be noted that since ElasticSearch is managed, it appears calls directly to ElasticSearch API will likely be ignored.
