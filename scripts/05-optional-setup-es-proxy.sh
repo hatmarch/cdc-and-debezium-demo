@@ -25,7 +25,7 @@ oc process -f ${DEMO_HOME}/kube/elasticsearch-proxy/elastic-search-proxy-templat
 
 # deployment should rollout automatically
 echo "Waiting up to 5 minutes for deployment to complete"
-oc wait --for=condition=available dc/elasticsearch-proxy --timeout=5m
+oc wait --for=condition=available dc/elasticsearch-proxy -n $PROJECT_NAME --timeout=5m
 echo "deployment complete"
 
 # Add a service to map to the template (port 8080)
