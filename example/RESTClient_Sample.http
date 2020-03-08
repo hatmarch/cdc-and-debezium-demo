@@ -1,6 +1,17 @@
+GET https://elasticsearch.openshift-logging.svc.cluster.local:9200/
+Authorization: Bearer XXXX
+
+POST http://docker.for.mac.localhost:8080/trasaction/trans HTTP/1.1
+Content-Type: application/json
+
 {
-  "name": "debezium-connector-mysql",
-  "config": {
+    "transactionNo": 435,
+    "amount": 1430
+}
+
+PUT http://my-connect-cluster-connect-api-debezium-cdc.apps.cluster-mel-dbz-2189.mel-dbz-2189.example.opentlc.com/connectors/debezium-connector-mysql/config
+Content-Type: application/json
+{
     "connector.class": "io.debezium.connector.mysql.MySqlConnector",
     "database.user": "root",
     "database.server.id": "184054",
@@ -10,20 +21,10 @@
     "transforms": "route",
     "database.server.name": "sampledb",
     "database.port": "3306",
-    "transforms.route.type": "org.apache.kafka.connect.transforms.RegexRouter",
-    "transforms.route.regex": "([^.]+)\\.([^.]+)\\.([^.]+)",
     "decimal.handling.mode": "double",
     "database.hostname": "mysql",
     "database.password": "password",
     "name": "debezium-connector-mysql",
     "database.whitelist": "sampledb",
-    "transforms.route.replacement": "$3"
-  },
-  "tasks": [
-    {
-      "connector": "debezium-connector-mysql",
-      "task": 0
-    }
-  ],
-  "type": "source"
+    "snapshot.mode": "when_needed"
 }

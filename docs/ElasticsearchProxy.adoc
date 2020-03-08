@@ -1,0 +1,43 @@
+= (Optional) Elasticsearch Proxy =
+
+If connecting to Elasticsearch instance in openshift-logging (from Cluster Logging Operator) in Fuse Online, it can be convenient to connect with Elasticsearch by way of a little Apache proxy that fixes two limitations of fuse:
+
+1. The Elasticsearch instance can only be accessed over https but it is secured with a self-signed certificate.  Fuse's HTTPS connector does not allow insecure connections (see link:https://github.com/syndesisio/syndesis/issues/224[here])
+
+2. The Elasticsearch instance needs an authorized user (Bearer token) but that requires a client setup in Fuse Online (see for instance link:https://access.redhat.com/documentation/en-us/red_hat_fuse/7.5/html-single/integrating_applications_with_fuse_online/index#creating-api-connectors_add-client-connector[here] which might not even be the proper means by which to get the connection with OAuth to the openshift cluster to work)
+
+** Instead, the proxy can be configured to send through the token of a specific account
+
+== Creating a pull-secret ==
+
+We are going to use the `registry.redhat.io/rhscl/httpd-24-rhel7` image tech details of which can be found link:https://access.redhat.com/containers/?tab=tech-details#/registry.access.redhat.com/rhscl/httpd-24-rhel7[here].
+
+To be able to pull this image, we'll need to ensure we have our secret setup and linked to the proper account.  
+
+First, create or switch to the project where you want the proxy installed.
+
+Then run this script passing in your registry.redhat.io username and password
+
+----
+$DEMO_HOME/scripts/util-create-pull-secret.sh <username> <password> <OPTIONAL:SECRET_NAME> <OPTIONAL:PROJECT_NAME>
+----
+
+== Installing the Proxy ==
+
+When you install the proxy, you will need to decide which project you install the proxy in.  It can be in its own project or in the same project as many of the other components (most likely `debezium-cdc`).
+
+To install the proxy, run this command logged in as a user with `cluster-admin` privileges
+
+----
+$DEMO_HOME/scripts/05-optional-setup-es-proxy.sh <OPTIONAL: PROJECT_NAME> 
+----
+
+== Note on access to elastic search ==
+
+The token that is used to access the elasticsearch endpoint must for a user that is part of a role that is configured to have write access to arbitrary indexes in ElasticSearch.  At the time of this writing, the OpenShift Cluster Logging operator installs ElasticSearch 5.6 and authentication and authorization is managed not by xpack but by SecureGuard.
+
+To see which OpenShift users/roles have what kind of access, use the es_acl command on an ElasticSearch node as per link:https://bugzilla.redhat.com/show_bug.cgi?id=1545920[here].
+
+image:images/es-acl.png[]
+
+It should be noted that since ElasticSearch is managed, it appears calls directly to ElasticSearch API will likely be ignored.

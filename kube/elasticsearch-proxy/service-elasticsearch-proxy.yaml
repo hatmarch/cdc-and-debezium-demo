@@ -1,0 +1,15 @@
+﻿kind: Service
+apiVersion: v1
+metadata:
+  name: elasticsearch-proxy
+spec:
+  ports:
+    - name: fuse-endpoint
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  selector:
+    deploymentconfig: elasticsearch-proxy
+  type: ClusterIP
+  sessionAffinity: None
+

@@ -152,6 +152,8 @@ Here are some of the aspects that were configured as part of `debezium-connector
 
 image:images/connector-config.png[]
 
+For more information about link:debezium-connector/connector-config.json[this configuration], see the documentation link:https://debezium.io/documentation/reference/1.0/connectors/mysql.html#connector-properties[here].
+
 If the connector is setup correctly it will create a number of different topics based on the database and the events it's been configured to look for.  For more information see the link:www.debezium.io[official web site]
 
 [TIP]
@@ -200,7 +202,7 @@ Test the connector by seeing messages come in as we change records in the demo-a
 
 1. Start watching the queue that represents database cdc events
 ----
-oc exec -c kafka my-cluster-kafka-0 -- /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic sampledb -n debezium-monitoring --from-beginning --max-messages 1
+oc exec -c kafka my-cluster-kafka-0 -n debezium-cdc -- /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic transaction --from-beginning --max-messages 1
 ----
 1. open the demo-app
 2. Click buy
@@ -221,6 +223,8 @@ Next we'll install Fuse online as the bridge between our CDC events from Debeziu
 This demo can be setup to connect to any Elasticsearch instance to which you have access.  If you don't have one handy, you can attempt to setup your own instance by installing cluster-logging on the OpenShift cluster.  
 
 You can setup cluster-logging by following the directions link:docs/CustomLogging.adoc[here].
+
+[blue]#You may also want to setup a proxy that allows cluster local http access to the cluster logging ElasticSearch instance and handles authentication.  You can find those instructions link:docs/ElasticSearchProxy.adoc[here]
 ====
 
 Install Fuse Online into our cluster by running this script:
@@ -266,13 +270,9 @@ For this section, we're going to assume you're connecting to the elasticsearch i
 At the time of this writing, the cluster-logging ElasticSearch version was 5.6.x.  Documentation for this version can be found link:https://www.elastic.co/guide/en/elasticsearch/reference/5.6/index.html[here].
 ====
 
-
-
-
-
 == Installing Custom Monitoring ==
 
-The debezium connector we deployed has also the JMX plugin installed within it that allows it to expose metrics to openshift.  We'll take advantage of OpenShift's custom ServiceMonitor (new in OpenShift 4.3) to dump those metrics into the central OpenShift prometheus instance
+The debezium connector we deployed has also the JMX plugin installed within it that allows it to expose metrics to openshift.  We'll take advantage of OpenShift's link:https://docs.openshift.com/container-platform/4.3/monitoring/monitoring-your-own-services.html[custom ServiceMonitor] (new in OpenShift 4.3) to dump those metrics into the central OpenShift prometheus instance
 
 The metrics were actually enabled in the previous step.  They were defined in the KafkaConnectS2I instance under the `metrics` key
 
@@ -348,3 +348,10 @@ image:images/debezium-custom-dashboard-example.png[]
 To get the metrics to look more real-time, you might consider adjusting the timings in the upper right corner of the dashboard
 
 image:images/dashboard-update.png[]
+
+[NOTE]
+====
+If for some reason you are not seeing any metrics being updated, it's possible you've had a new instance of the connector start and you're looking at the data from the old instance.  To check this, go to the _Connector Node_ dropdown and select a different instance:
+
+image:images/connector-node-fix.png[]
+====

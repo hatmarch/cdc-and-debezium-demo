@@ -23,24 +23,7 @@ echo $'\ndone.'
 # Configure the connector by calling through to its API
 # The values therein are coming from values set from the previous script and yaml files
 curl -X PUT -H "Content-Type: application/json" \
--d '{ 
-    "connector.class": "io.debezium.connector.mysql.MySqlConnector",
-    "tasks.max": "1",
-    "database.hostname": "mysql", 
-    "database.port": "3306", 
-    "database.user": "root", 
-    "database.password": "password", 
-    "database.server.id": "184054",
-    "database.server.name": "sampledb", 
-    "database.whitelist": "sampledb",
-    "database.history.kafka.bootstrap.servers": "my-cluster-kafka-bootstrap:9092", 
-    "database.history.kafka.topic": "changes-topic",
-    "decimal.handling.mode" : "double",
-    "transforms": "route",
-    "transforms.route.type": "org.apache.kafka.connect.transforms.RegexRouter",
-    "transforms.route.regex": "([^.]+)\\.([^.]+)\\.([^.]+)",
-    "transforms.route.replacement": "$3"
-}' \
+    -d @$DEMO_HOME/debezium-connector/connector-config.json \
     http://$DBZ_CONNECTOR/connectors/debezium-connector-mysql/config
 
 echo $'\nChecking that the mysql connector has been initialized:'
