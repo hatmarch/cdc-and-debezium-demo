@@ -7,7 +7,10 @@ else
 fi
 
 # Find the token secret for default account for this project
-SECRET_NAME=$(oc get sa default -o jsonpath='{.secrets[0].name}' -n ${PROJECT_NAME})
+# NOTE: regexp of the JSONPATH specifications (see: https://github.com/json-path/JsonPath) are not yet available in 
+# kubernetes as per here: https://github.com/kubernetes/kubernetes/issues/61406
+# This would have allowed us to only use the jsonpath to return the necessary secret name.  
+SECRET_NAME=$(oc get sa default -o jsonpath='{.secrets[*].name}' -n $PROJECT_NAME | tr " " "\n" | grep -i token )
 
 # Make that default account cluster admin  
 # FIXME: Instead of cluster admin, need to find another role that has access to dump 
@@ -16,7 +19,7 @@ oc adm policy add-cluster-role-to-user cluster-admin -z default -n ${PROJECT_NAM
 
 # create a configmap from virtserv.conf
 CONFIG_MAP_NAME="es-proxy-config"
-oc create configmap ${CONFIG_MAP_NAME} --from-file=${DEMO_HOME}/kube/elasticsearch-proxy/conf.d
+oc create configmap ${CONFIG_MAP_NAME} --from-file=${DEMO_HOME}/kube/elasticsearch-proxy/conf.d -n ${PROJECT_NAME}
 
 # process the template
 oc process -f ${DEMO_HOME}/kube/elasticsearch-proxy/elastic-search-proxy-template.yaml \
@@ -25,7 +28,7 @@ oc process -f ${DEMO_HOME}/kube/elasticsearch-proxy/elastic-search-proxy-templat
 
 # deployment should rollout automatically
 echo "Waiting up to 5 minutes for deployment to complete"
-oc wait --for=condition=available dc/elasticsearch-proxy --timeout=5m
+oc wait --for=condition=available dc/elasticsearch-proxy -n $PROJECT_NAME --timeout=5m
 echo "deployment complete"
 
 # Add a service to map to the template (port 8080)

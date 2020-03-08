@@ -268,7 +268,59 @@ Click _Next_ for the next screen and then you'll be returned to the connections 
 For this section, we're going to assume you're connecting to the elasticsearch instance that is installed on the cluster in the `openshift-logging` project.  If you are trying to connect to a different Elasticsearch instance, you'll need to update endpoints (and possibly commands depending on version) accordingly.
 
 At the time of this writing, the cluster-logging ElasticSearch version was 5.6.x.  Documentation for this version can be found link:https://www.elastic.co/guide/en/elasticsearch/reference/5.6/index.html[here].
+
+[red]#This section assumes that an "Elasticsearch proxy" is used to make connection to Fuse easier.  Follow the instructions link:docs/ElasticsearchProxy.adoc[here] to setup the Elasticsearch proxy.#
 ====
+
+Click on connections as before, search for http, and select the HTTP Connector
+
+image:images/syndesis-http.png[]
+
+The HTTP Connector is a very simple connector that just allows the calling of an http endpoint.  We will be calling our proxy which will do some important things for us:
+
+- It will provide an "Authorization Bearer: " token to the openshift-logging Elasticsearch instance (using default sa for project)
+- It will allow connection to an insecure (i.e. self-signed) endpoint (which is not yet possible via the HTTPS connector in the previous image, see link:https://github.com/syndesisio/syndesis/issues/224[here])
+
+Given that the proxy is doing the heavy lifting, we just need to enter the name of our proxy (service) in the box as shown:
+
+image:images/syndesis-http-connection-details.png
+
+Then click validate.  This should result in the green message as seen above (if not, this might indicate an issue with the elasticsearch-proxy setup).  Once the connection is validated, click next.
+
+Give a description and a name as you see fit.
+
+=== Create an Integration ===
+
+Now we going to use the two connectors you setup previously and connect them together
+
+To create a new integration, click on _Integrations_ and then the _Create Integration_ button.
+
+image:images/syndesis-create-integration.png[]
+
+Next choose the _Kafka Message Broker_ connection:
+
+image:images/syndesis_select_kafka.png[]
+
+Then modify the subscription by clicking on _Select_
+
+image:images/syndesis-kafka-select.png[]
+
+On the next page use the dropdown to select the `sampledb.sampledb.transaction` topic and then click _Next_:
+
+image:images/syndesis-kafka-topic.png[]
+
+We want the Kafka connection in this integration to *not* be typeless.  So next we'll provide a sample JSON instance to Fuse Online to allow it to intuit the schema.  To do this:
+
+1. select _JSON Instance_ from the dropdown 
+2. then paste the contents of link:example/debezium-update-event.json[`example/debezium-update-event.json`] in the textbox
+3. Then provide a name (and optionally a description) for this connection
+4. Then click _Next_
+
+image:images/syndesis-kafka-schema.png[]
+
+When you are returned to the (new) Integration screen, click on the HTTP tile to start leveraging the http connector:
+
+image:images/syndesis-http-integration.png[]
 
 == Installing Custom Monitoring ==
 
