@@ -1,0 +1,89 @@
+
+apiVersion: v1
+kind: Template
+metadata:
+  name: elasticsearch-proxy
+  annotations:
+    openshift.io/display-name: "ElasticSearch Proxy"
+    description: >-
+      Creates an apache server to act as a proxy to turn insecure https into http (with a bearer token)
+    tags: "monitoring"
+    iconClass: "fa fa-exchange"
+message: "Data source being created ${PROJECT_NAME}"
+parameters:
+- description: The name of the project the operator will be installed to
+  displayName: Name of project
+  name: PROJECT_NAME
+  value: debezium-cdc
+  required: true
+- description: The name of the configuration map that holds the ApacheServer included config
+  displayName: Config Map Name
+  name: CONFIG_MAP_NAME
+  value: es-proxy-conf
+  required: true
+- description: The name of the secret associated with the service account.
+  displayName: Service Account Secret
+  name: SECRET_NAME
+  required: true
+objects:
+- kind: DeploymentConfig
+  apiVersion: apps.openshift.io/v1
+  metadata:
+    name: elasticsearch-proxy
+    labels:
+      app: es-proxy
+  spec:
+    strategy:
+      type: Rolling
+      rollingParams:
+        updatePeriodSeconds: 1
+        intervalSeconds: 1
+        timeoutSeconds: 600
+        maxUnavailable: 25%
+        maxSurge: 25%
+      resources: {}
+      activeDeadlineSeconds: 21600
+    triggers:
+      - type: ConfigChange
+    replicas: 1
+    revisionHistoryLimit: 10
+    test: false
+    selector:
+      deploymentconfig: proxy
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          deploymentconfig: proxy
+      spec:
+        volumes:
+          - name: httpd-conf
+            configMap:
+              name: ${CONFIG_MAP_NAME}
+              defaultMode: 420
+        containers:
+          - resources: {}
+            terminationMessagePath: /dev/termination-log
+            name: proxy
+            ports:
+              - containerPort: 8080
+                protocol: TCP
+              - containerPort: 8443
+                protocol: TCP
+            imagePullPolicy: Always
+            volumeMounts:
+              - name: httpd-conf
+                mountPath: /etc/httpd/conf.d/user.conf
+            terminationMessagePolicy: File
+            envFrom:
+              - prefix: ELASTICSEARCH_
+                secretRef:
+                  name: ${SECRET_NAME}
+            image: >-
+              registry.redhat.io/rhscl/httpd-24-rhel7@sha256:32e50b54dccf847354e224d18ba58f39da053e351cf2377a9865206a43c5c62a
+        restartPolicy: Always
+        terminationGracePeriodSeconds: 30
+        dnsPolicy: ClusterFirst
+        securityContext: {}
+        schedulerName: default-scheduler
+  
