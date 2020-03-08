@@ -50,8 +50,10 @@ oc wait --for=condition=Available deployment/cluster-logging-operator --timeout=
 sleep 5
 
 # wait until all deployments in the project are ready
-NUM_DEPLOYMENTS=$(oc get deployments --no-headers=true -n openshift-logging | wc -l)
 while true; do
+    # depending upon when we query, new deployments may appear, so look for them at every iteration
+    NUM_DEPLOYMENTS=$(oc get deployments --no-headers=true -n openshift-logging | wc -l)
+
     # wait until at least 1 deployment is ready from each deployment
     NUM_READY_DEPLOYMENTS=$(oc get deployments -o custom-columns=READY:.status.readyReplicas --no-headers=true -n openshift-logging | grep -v \<none\> | wc -l)
     if [ $NUM_DEPLOYMENTS -eq $NUM_READY_DEPLOYMENTS ]; then
