@@ -283,7 +283,7 @@ The HTTP Connector is a very simple connector that just allows the calling of an
 
 Given that the proxy is doing the heavy lifting, we just need to enter the name of our proxy (service) in the box as shown:
 
-image:images/syndesis-http-connection-details.png
+image:images/syndesis-http-connection-details.png[]
 
 Then click validate.  This should result in the green message as seen above (if not, this might indicate an issue with the elasticsearch-proxy setup).  Once the connection is validated, click next.
 
@@ -291,11 +291,18 @@ Give a description and a name as you see fit.
 
 === Create an Integration ===
 
+[NOTE]
+====
+This section can be skipped by importing into Fuse Online the files found in link:example/fuse[this directory].  You can move on to <<Publish (Start) the Integration,publishing>> the integration.
+====
+
 Now we going to use the two connectors you setup previously and connect them together
 
 To create a new integration, click on _Integrations_ and then the _Create Integration_ button.
 
 image:images/syndesis-create-integration.png[]
+
+==== Integration Input Connection (Source) =====
 
 Next choose the _Kafka Message Broker_ connection:
 
@@ -318,9 +325,87 @@ We want the Kafka connection in this integration to *not* be typeless.  So next 
 
 image:images/syndesis-kafka-schema.png[]
 
+==== Integration Output Connection (Sink) ====
+
 When you are returned to the (new) Integration screen, click on the HTTP tile to start leveraging the http connector:
 
 image:images/syndesis-http-integration.png[]
+
+Enter the following for Method and URL Path and click _Next_
+
+image:images/syndesis-http-instance.png[]
+
+Next we need to indicate an example of the data (again by way of a _JSON Instance_) that we want to `POST` to our HTTP endpoint.  You can take the information in link:example/elasticsearch-example.json[elasticsearch-example.json] and paste it into the _Definition_ field.
+
+NOTE: This is a necessary pre-requisite to being able to add a datamapper
+
+image:images/syndesis-http-json-instance.png[]
+
+==== Add Datamapping ====
+
+Next we need to add a step between our <<Integration Input Connection (Source), Source>> and <<Integration Output Connection (Sink),Sink>> to map our input schema into our output schema.  This is where a lot of the power of Fuse is seen.
+
+Click the + between the Source and Sink.  Then on the next screen, select the _Data Mapper_ tile
+
+image:images/syndesis-add-datamapper.png[]
+
+Next expand the _Source_ data (1), specifically _payload_ > _after_ (which represents the fields in the DB after the data change event), then expand the _Target_ data.  Now select the source data instance and then the target data instance for amount (2) and then transactionId (3).  Finally, click _Done_ (4)
+
+iamge:images/syndesis-datamapping.png[]
+
+==== Add Filter (Optional) ====
+
+Just to show off a little bit of what Fuse can do, we'll also add a filter that only sends information to the sink (target) if the amount is more than 1000 dollars.  
+
+To start this process, click the `+` between the datamapper and the target _Http Connection_.  Then select _Basic Filter_
+
+image:images/syndesis-data-filter.png[]
+
+Because of where in the integration we've chosen to add the filter, that is, after the data mapping step, we will be operating on the target fields.  The dropdowns on the _Basic Filter_ details screen are pre-populated based on this.  
+
+Fill in the fields to match the screenshot (_amount_ _greater than_ _1000_) and then click _Done_
+
+image:images/syndesia-filter-detail.png[]
+
+=== Publish (Start) the Integration ===
+
+Now that our integration is defined, when we return to the integration overview page, we can click the _Publish_ button to deploy our integration.  When prompted, name your integration and then click _Save and Publish_
+
+image:images/syndesis-publish.png[]
+
+Once published, the integration needs to get built and deployed on OpenShift (which can take a while).  You can monitor progress from the main Fuse Online Dashboard:
+
+image:images/syndesis-pending.png[]
+
+If it takes a long time to deploy, then see the <<Fuse Publish Troubleshooting,troubleshooting>> section.
+
+==== Fuse Publish Troubleshooting ====
+
+===== Integration build failure =====
+
+Sometimes integrations fail to publish due to the integration build failing to access the image from Red Hat's image registry.  To check this, go to Builds and then see if there is a build named for your integration that is set to _Failed_.  Check the build logs.  If you see the following, then you have a authentication issue:
+
+----
+Receiving source from STDIN as archive ...
+Caching blobs under "/var/cache/blobs".
+Warning: Pull failed, retrying in 5s ...
+Warning: Pull failed, retrying in 5s ...
+Warning: Pull failed, retrying in 5s ...
+error: build error: After retrying 2 times, Pull image still failed due to error: unable to retrieve auth token: invalid username/password: unauthorized: Please login to the Red Hat Registry using your Customer Portal credentials. Further instructions can be found here: https://access.redhat.com/RegistryAuthentication
+----
+
+To fix this, you need to make sure the 
+
+datamapper
+
+
+FIXME FIXME FIXME> Pickup from here with filling in the HTTP connector
+
+FIXME: Datamapper
+
+FIXME: Filter
+
+FIXME: Export, name of file and add quick instructions for it...
 
 == Installing Custom Monitoring ==
 
