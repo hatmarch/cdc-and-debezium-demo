@@ -90,7 +90,7 @@ image:../images/pvc-error.png[]
 If the error looks to be a transient one, you can attempt to reinstall cluster logging by deleting the cluster logging CR instance, waiting a little bit for all the resources to be cleaned up (leaving only the operator pod in the `openshift-logging` namespace) and re-run the script
 
 ----
-oc delete customlogging instance -n openshift-logging
+oc delete clusterlogging instance -n openshift-logging
 ----
 
 Wait for the output of `oc get pods` to look something like this:
