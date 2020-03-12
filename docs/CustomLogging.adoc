@@ -62,6 +62,13 @@ oc apply -f $DEMO_HOME/kube/logging/customlogging-instance.yaml -n openshift-log
 
 === Troubleshooting ===
 
+==== Can't access Kibana ====
+
+If you can't access Kibana via the route and the kibana pod is running without error, then check the kibana-proxy container's logs.  It's possible some certificates are out of date or that oauth has somehow expired.
+
+It's unclear exactly how to fix this, as just restarting the kibana pod doesn't help; must be something more persistent like data in the mounted secrets.  However, deleting the `ClusterLogging` instance and re-running the setup script seems to restore accees.
+
+==== Stalled Install ====
 If the script doesn't finish after about 5 minutes and you're continuing to see lines like this:
 
 ----
