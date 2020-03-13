@@ -19,6 +19,7 @@ RUN cd /usr/local/bin && \
 
 # install AWS cli
 RUN curl "https://d1vvhvl2y92vvt.cloudfront.net/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
-    unzip awscliv2.zip && ./aws/install && rm awscliv2.zip && rm -rf ./aws && ln -s /usr/local/bin/aws2 /usr/local/bin/aws
+    unzip awscliv2.zip && ./aws/install && rm awscliv2.zip && rm -rf ./aws \
+    # && ln -s /usr/local/bin/aws2 /usr/local/bin/aws
 
 USER jboss
