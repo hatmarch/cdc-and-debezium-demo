@@ -19,6 +19,13 @@ oc apply -f $DEMO_HOME/kube/fuse/fuse-operator-group.yaml
 # link the operator to the secret above
 oc secrets link syndesis-operator connects2i --for=pull
 
+# link the builder to the secret for when it comes time to build our integrations
+oc secrets link builder connects2i --for=pull
+
+# looks like there may be a bug and the builder needs the pullsecret listsed as
+# a generic secret
+oc secrets link builder connects2i
+
 # wait for syndesis operator deployment
 sleep 5
 oc wait --for=condition=available deployment/syndesis-operator --timeout=5m
