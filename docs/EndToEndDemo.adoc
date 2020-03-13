@@ -2,7 +2,7 @@
 
 In this section we integrate all the different pieces to show information flowing from the demostration website all the way through to Elasticsearch and Kibana.
 
-NOTE: Instructions assume all the different components have been installed as per link:README.adoc[here].  It's also assumed that the link:scripts/shell-setup.sh
+NOTE: Instructions assume all the different components have been installed as per link:../README.adoc[here].  It's also assumed that the link:scripts/shell-setup.sh
 
 == Component Setup ==
 

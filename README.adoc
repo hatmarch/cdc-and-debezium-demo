@@ -1,6 +1,11 @@
 = Change Data Capture with Debezium (on OpenShift 4.3) =
 
-This demo shows how you can install Debezium on an OpenShift 4.3 (and above) cluster.
+[NOTE]
+====
+These are the setup instructions to demonstrate the backbone of a Debezium implementation.  Steps to run the demo are in the document link:docs/EndToEndDemo.adoc[EndToEndDemo.adoc]
+====
+
+These instructions walk you through the installation of Debezium on an OpenShift 4.3 (and above) cluster.
 
 There is a small app at the heart of the demo that is writing to a MySQL database (it's added to this repo as a submodule).  
 
