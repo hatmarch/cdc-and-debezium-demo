@@ -74,7 +74,27 @@ image:../images/grafana-connector-ip.png[]
 
 === Kibana and Elasticsearch ===
 
-[red]#FIXME# 
+For this, we want to be able to show the log entries in Elasticsearch that make it through our Fuse Online integration.  One of the best ways to visualize this is to use the Kibana instance that was created as part of the link:CustomLogging.adoc[Cluster Logging Installation]
+
+1. Open the kibana dashboard by opening the route below:
+
+----
+echo "https://$(oc get route kibana -n openshift-logging -o jsonpath="'{ .spec.host }')/
+----
+
+2. Select _Management_ and then select _Index patterns_
+
+image:../images/kibana-management.png[]
+
+3. Press _Create Index_ and then on the screen that appears, clear the _Index Pattern_ text box and type in `transaction*` for find the indexes that are created by our Fuse Online Integration.  Then press _Create_
+
+image:../images/kibana-create-index.png[]
+
+4. Upon clicking create, you should see a screen with the fields of the index.  Verify these are the correct fields
+
+image:../images/kibana_index_transaction.png[]
+
+
 
 === Window Layout ===
 
@@ -118,6 +138,6 @@ image:../images/syndesis-filtered.png[]
 
 image:../images/syndesis-greater-than.png[]
 
-6. Show new entry under transaction log
+6. Show new entry under transaction log in Kibana
 
 7. Show that the amount and transactionNo matches that in the kafka window
