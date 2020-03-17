@@ -33,6 +33,7 @@ oc create secret docker-registry $SECRET_NAME \
     --docker-password="$PASSWORD" \
     --docker-email=mhildenb@redhat.com -n $PROJECT_NAME
 
-oc secrets link default $SECRET_NAME
-
+# This should supposedly use --for=pull as its a pull secret, however in OpenShift 4.3 that doesn't appear to work exclusively
+oc secrets link pipeline $SECRET_NAME -n $PROJECT_NAME --for=pull
+oc secrets link pipeline $SECRET_NAME -n $PROJECT_NAME 
 
